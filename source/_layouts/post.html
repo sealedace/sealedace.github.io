@@ -1,37 +1,16 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="1265">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times}
-    p.p2 {margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px Times}
-    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; min-height: 14.0px}
-    span.s1 {text-decoration: underline ; color: #0000ee}
-    span.s2 {font: 12.0px 'Songti SC'}
-  </style>
-</head>
-<body>
-<p class="p1">--- layout: default single: true ---</p>
-<p class="p1">{% include article.html %}</p>
-<p class="p2">{% include post/author.html %} {% include post/date.html %}{% if updated %}{{ updated }}{% else %}{{ time }}{% endif %} {% include post/categories.html %}</p>
-<p class="p1">{% unless page.sharing == false %} {% include post/sharing.html %} {% endunless %}</p>
-<p class="p2">{% if page.previous.url %} <a href="file:///Users/xu/octopress/source/_layouts/%7B%7Bpage.previous.url%7D%7D"><span class="s1">« {{page.previous.title}}</span></a> {% endif %} {% if page.next.url %} <a href="file:///Users/xu/octopress/source/_layouts/%7B%7Bpage.next.url%7D%7D"><span class="s1">{{page.next.title}} »</span></a> {% endif %}</p>
-<p class="p1">{% if site.disqus_short_name and page.comments == true %}</p>
-<h1 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px Times"><b>Comments</b></h1>
-<p class="p1">{% include post/disqus_thread.html %}</p>
-<p class="p1">{% endif %}<span class="Apple-converted-space"> </span></p>
-<p class="p4"><br></p>
-<p class="p1"><span class="s2">{</span>% if site.duoshuo_short_name and site.duoshuo_comments == true and page.comments == true %}</p>
-<h1 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px Times"><b>Comments</b></h1>
-<p class="p1"><span class="s2">{</span>% include post/duoshuo.html %}</p>
-<p class="p1"><span class="s2">{</span>% endif %}</p>
-<p class="p4"><br></p>
-<p class="p1">{% unless page.sidebar == false %}</p>
-<p class="p1">{% if site.post_asides.size %} {% include_array post_asides %} {% else %} {% include_array default_asides %} {% endif %}</p>
-<p class="p1">{% endunless %}</p>
-</body>
-</html>
+---
+layout: default
+single: true
+---
+
+<article class="post" itemscope itemtype="http://schema.org/BlogPosting">{% include article.html %}</article>
+{% unless page.sharing == false %}
+        {% include post/sharing.html %}
+{% endunless %}
+
+{% if site.duoshuo_short_name and site.duoshuo_comments == true %}
+<section>
+    <h1>评论</h1>
+    <div id="comments" aria-live="polite">{% include post/duoshuo.html %}</div>
+</section>
+{% endif %}
