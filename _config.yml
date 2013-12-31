@@ -73,8 +73,8 @@ duoshuo_comments: true
 duoshuo_short_name: sealedace
 
 # Twitter
-twitter_user: SealedAce
-twitter_tweet_button: true
+#twitter_user: SealedAce
+#twitter_tweet_button: true
 
 # Google +1
 #google_plus_one: false
@@ -94,11 +94,11 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name:
-disqus_show_comment_count: false
+disqus_short_name: sealedace
+disqus_show_comment_count: true
 
 # Google Analytics
 google_analytics_tracking_id:
 
 # Facebook Like
-facebook_like: true
+facebook_like: false
