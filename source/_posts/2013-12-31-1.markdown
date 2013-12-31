@@ -7,20 +7,48 @@ categories:
 ---
 <!--more-->
 
+[Espresso]: /images/2013/12/espresso.jpg
+[TextMate]: /images/2013/12/textmate.jpg
+[Aptana Studio 3]: /images/2013/12/AptanaStudio3.jpg
+[Taco HTML]: /images/2013/12/tacoHTML.jpg
+[Tumult HyperEdit]: /images/2013/12/TumultHyperEdit.jpg
+[Dreamweaver CS6]: /images/2013/12/dreamweaver.jpg
+[Coda 2]: /images/2013/12/coda2.jpg
+[SkEdit]: /images/2013/12/skedit.jpg
+[Firebug]: /images/2013/12/firebug.jpg
+[BareBones]: /images/2013/12/barebones.jpg
+[Text Wrangler]: /images/2013/12/textwrangler.jpg
+[EditRocket]: /images/2013/12/editrocket.jpg
+[Komodo Edit]: /images/2013/12/komodoedit.jpg
+
 参考：[12+ Useful Code Editors for Mac](http://bloomwebdesign.net/2012/07/12-useful-code-editors-for-mac/)。
 
-13款实用的代码编辑器。很多其实我都没用过，这里mark一下，嗯。
+Mac上13款实用的代码编辑器，推荐一下。
+至于哪个好用，这个看各人的需要和喜好了。
 
 ####1. [Espresso](http://macrabbit.com/espresso/)
+![Espresso]
 ####2. [TextMate](http://macromates.com/)
+![TextMate]
 ####3. [Aptana Studio 3](http://www.aptana.com/products/studio3)
+![Aptana Studio 3]
 ####4. [Taco HTML Edit for Mac OS X](http://tacosw.com/)
+![Taco HTML]
 ####5. [Tumult HyperEdit](http://tumult.com/HyperEdit/)
+![Tumult HyperEdit]
 ####6. [Dreamweaver CS6](http://www.adobe.com/products/dreamweaver.html)
+![Dreamweaver CS6]
 ####7. [Coda 2](http://www.panic.com/coda/)
+![Coda 2]
 ####8. [SkEdit](http://www.skedit.com/)
+![SkEdit]
 ####9. [Firebug](http://getfirebug.com/)
+![Firebug]
 ####10. [BareBones](http://www.barebones.com/products/bbedit/benefitscommand.html)
+![BareBones]
 ####11. [Text Wrangler](http://www.barebones.com/products/textwrangler/)
+![Text Wrangler]
 ####12. [EditRocket](http://www.editrocket.com/)
+![EditRocket]
 ####13. [Komodo Edit](http://www.activestate.com/komodo-edit)
+![Komodo Edit]
