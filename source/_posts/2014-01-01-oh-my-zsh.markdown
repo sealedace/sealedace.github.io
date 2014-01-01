@@ -1,0 +1,17 @@
+---
+layout: post
+title: "使用oh-my-zsh"
+date: 2014-01-01 23:41:21 +0800
+comments: true
+published: true
+categories: 开发工具
+---
+
+[使用zsh的九个理由]: http://lostjs.com/2012/09/27/zsh
+
+惯用终端的童鞋一般都使用bash，不过那是在zsh出现之前的事情了，现在都流行使用zsh了。有关于zsh的介绍，请参考[这里][使用zsh的九个理由]。
+
+我就贴一下安装方法，装了后自己用下就知道zsh的强大了。
+```
+curl -L https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | sh
+```
