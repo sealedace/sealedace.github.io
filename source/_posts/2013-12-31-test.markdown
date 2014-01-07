@@ -1,0 +1,17 @@
+---
+layout: post
+title: "test"
+date: 2013-12-31 18:20:20 +0800
+comments: true
+published: false
+categories: 
+---
+
+block机制
+```objc
+self.myTableView.selectionHandler = ^void(NSIndexPath *selectedIndexPath) {
+    // handle selection ...
+};
+```
+
+slkdf;laksf
