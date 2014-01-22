@@ -10,6 +10,7 @@ categories: iOS开发
 [fir2]: /images/2014/1/fir_2.png
 [1]:http://firapp.duapp.com/about
 [2]:http://weibo.com/trawor
+[3]:http://firapp.duapp.com
 
 本文章主要介绍一个iOS app的版本分发工具FIR ([什么是FIR][1])。
 
@@ -25,7 +26,7 @@ categories: iOS开发
 使用方法
 ---
 
-上图
+首先打开[FIR主页][3]。接着按照网页指引操作即可（太easy了-@_@）。
 
 ![fir1]
 
