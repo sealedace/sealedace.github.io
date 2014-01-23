@@ -10,14 +10,11 @@ categories: iOS开发
 [chuan2]: http://beyondvincent.com/blog/2013/12/14/124-communication-patterns
 [ref1]: http://blog.random-ideas.net/?p=160
 
-在进入正题之前，建议读一下[船哥][chuan1]的文章[iOS中消息的传递机制][chuan2]。里面除了描述iOS中消息的传递机制，还提供了一些idea帮助大家正确选择某种传递方法来完成工作。
+在进入正题之前，建议读一下[船哥][chuan1]的文章[iOS中消息的传递机制][chuan2]。里面除了描述iOS中消息的传递机制，还提供了一些思路帮助大家正确选择某种传递方法来完成开发工作。而本篇文章的主题是跟block相关的。
 
-不过本篇文章的主题是关于block的`retain cycle`。
+我们知道在使用block时，必须避免出现`retain cycle`。如果写代码不仔细造成了`retain cycle`，就会出现内存泄露。即使Xcode有静态代码分析工具，但很多时候Xcode也不太靠谱，根本什么提示都没有，所以还是自己写代码多注意比较好。
 
-（译自[The Correct Way to Avoid Capturing Self in Blocks With ARC][ref1]，有小修改）
-
-
-使用block时，我们必须避免出现`retain cycle`，否则就会出现内存泄露。（虽然有时Xcode的静态代码分析工具会给我们提示，但很多时候Xcode也不太靠谱，还是自己写代码多注意比较好。）
+（下文译自[The Correct Way to Avoid Capturing Self in Blocks With ARC][ref1]，有小改动）
 
 以前避免`retain cycle`的方法大概像这样：
 
