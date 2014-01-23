@@ -17,7 +17,7 @@ categories: iOS开发
 （译自[The Correct Way to Avoid Capturing Self in Blocks With ARC][ref1]，有小修改）
 
 
-使用block时，我们必须避免出现`retain cycle`，否则就会出现内存泄露。有时Xcode的静态代码分析工具会给我们提示，
+使用block时，我们必须避免出现`retain cycle`，否则就会出现内存泄露。（虽然有时Xcode的静态代码分析工具会给我们提示，但很多时候Xcode也不太靠谱，还是自己写代码多注意比较好。）
 
 以前避免`retain cycle`的方法大概像这样：
 
