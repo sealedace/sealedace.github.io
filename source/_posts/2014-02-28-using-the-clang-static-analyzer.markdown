@@ -20,15 +20,22 @@ categories: iOS开发 Clang
 Clang是什么？
 ---
 
-Clang is part of the LLVM project. LLVM is essentially a compiler and JIT virtual machine framework. Some of the compiler bits are currently available in Mac OS X as llvm-gcc, which fits a gcc parser/front-end to the LLVM code generator/back-end. Clang aims to essentially fill in the other half, and provide a parser/front-end as part of the LLVM project itself, which will allow a pure LLVM compiler.
+Clang是[LLVM][2]项目的一部分。LLVM本质上其实是编译器和JIT虚拟机非常重要的一个框架。
+在Mac OS X上有一些llvm-gcc编译器，其实就是将gcc解析器/前端嫁接到了llvm代码生成器/后端。而Clang旨在填补gcc的位置，在LLVM项目里面作为解释器/前端，这样就产生了这样一个纯净的LLVM编译器。
 
-Clang是[LLVM][2]项目的一部分。而LLVM是对编译器和JIT虚拟机非常重要的一个框架。
+这样做的意义何在？为什么不直接用gcc呢？其实也很简单：
 
-What's the point of this, and why not just use gcc? It's actually pretty simple: gcc is old and crufty and slow. It has a huge amount of legacy baggage and is not very easy to work with. Clang is considerably more lightweight and its code is much more modular.
+1. gcc比较古老，复杂而且效率不高。
 
-That last part is important for this, because some enterprising people have done taken Clang and implemented a static code analyzer with it. In essence, it's a compiler that, instead of translating your code to machine language, goes through and looks for mistakes.
+2. 大坨的遗存下来数据包，不仅大而且不易配合使用。
+
+3. 相比之下，Clang就显得体积小，而且代码模块化做的更好。
+
+要说的最重要的其实是，有些进取心强的人已经为Clang写了一套静态代码分析工具。本质上来讲，它是一个会帮你检查代码错误而不是把你的代码转成机器语言的编译器。
 
 The Clang Static Analyzer (which I will now abbreviate as CSA even though everybody calls it "clang", because Clang is actually the name for the entire front-end, not just CSA) is still early in development and very incomplete, but is still very useful even so.
+
+Clang静态分析工具，the Clang Static Analyzer（大家一般都直接使用“clang”来表示它，但是我还是坚持用CSA简称，因为Clang实际上是整个前端的名字，不只是CSA而已），
 
 Where Is It?
 The main CSA web page can be found at http://clang.llvm.org/StaticAnalysis.html, and it can be downloaded using the link at the bottom right. I won't link directly to the download because it's still in very active development and so the download link updates frequently.
