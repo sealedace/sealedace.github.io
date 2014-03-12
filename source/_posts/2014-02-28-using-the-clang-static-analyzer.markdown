@@ -9,6 +9,8 @@ categories: iOS开发 Clang
 
 [1]:https://www.mikeash.com/pyblog/friday-qa-2009-03-06-using-the-clang-static-analyzer.html
 [2]:http://llvm.org
+[3]:http://clang.llvm.org/StaticAnalysis.html
+[4]:http://clang.llvm.org/
 
 注：本文译自[Using the Clang Static Analyzer][1]。
 
@@ -33,12 +35,16 @@ Clang是[LLVM][2]项目的一部分。LLVM本质上其实是编译器和JIT虚�
 
 要说的最重要的其实是，有些进取心强的人已经为Clang写了一套静态代码分析工具。本质上来讲，它是一个会帮你检查代码错误而不是把你的代码转成机器语言的编译器。
 
-The Clang Static Analyzer (which I will now abbreviate as CSA even though everybody calls it "clang", because Clang is actually the name for the entire front-end, not just CSA) is still early in development and very incomplete, but is still very useful even so.
+Clang静态分析工具，the Clang Static Analyzer（大家一般都直接使用“clang”来表示它，但是我还是坚持用CSA简称，因为Clang实际上是整个前端的名字，不只是CSA而已）尚处于开发中，而且还不完整。尽管如此，它还是非常实用的。
 
-Clang静态分析工具，the Clang Static Analyzer（大家一般都直接使用“clang”来表示它，但是我还是坚持用CSA简称，因为Clang实际上是整个前端的名字，不只是CSA而已），
+*注：这篇文章比较久远，clang现在已经很完善了。
 
 Where Is It?
 The main CSA web page can be found at http://clang.llvm.org/StaticAnalysis.html, and it can be downloaded using the link at the bottom right. I won't link directly to the download because it's still in very active development and so the download link updates frequently.
+
+它在哪儿？
+---
+它的主页在~~[http://clang.llvm.org/StaticAnalysis.html][3]~~ [http://clang.llvm.org/][4]。你可以在主页里下载。
 
 How To Use It
 Using CSA is extremely easy. It provides a scan-build command which you simply invoke at the command line, passing the command to build your code as the parameters. scan-build will do some funky business to convince gcc to pass control over to CSA as it builds, allowing CSA to analyze all of your code instead of actually getting it built.
