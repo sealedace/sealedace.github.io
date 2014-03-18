@@ -8,32 +8,32 @@ categories: iOS开发
 ---
 
 [1]:https://www.mikeash.com/pyblog/friday-qa-2014-01-24-introduction-to-libclang.html
+[2]:http://llvm.org/svn/llvm-project/cfe/trunk/include/clang-c
+[3]:http://clang.llvm.org/doxygen/group__CINDEX.html
 
 注：本文译自[Introduction to libclang][1]。
 
-In addition to its many other fine attributes, the Clang compiler also provides a clean API that makes it easy to use its facilities as a library in your own code. Today, I'm going to give a basic introduction to this library and how to use it, a topic suggested by reader Jeffrey Macko.
 
-除了
+Clang编译器除了它一般正常的功能，同时它也有一套很清晰的API能将它作为一个库在你的代码中来使用它。今天，我就将Clang作为一个库来作个基本介绍。
 
-Getting the Library
-The library version of Clang is called, creatively, libclang. Xcode uses libclang extensively, and embeds the dylib that you can conveniently use yourself. You wouldn't want to use this in a shipping app, but it's a great way to get started and experiment. It's buried deep in the app, but this command will get you the path:
+##获取libclang库
 
-    echo `xcode-select --print-path`/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib
-You'll also need to add the enclosing directory to your runpath so that the dynamic linker can find the library at runtime. If you're building from the command line, you can do this by passing -rpath followed by the path to the lib directory above. In full, you'll want to pass these parameters when linking:
+Clang的库版本，创造性的叫做libclang（很显然的= =）。Xcode使用libclang很广泛，并且将之嵌入到dylib里去，这样一来，开发者就很方便的就可以使用了。你当然不会想在正式的应用开发中使用它，但这至少是一个很好的方法去开始并试验。这个库文件的路径很隐藏很深，你可以使用下面这个命令来获取它的完整路径：
+```bash
+	echo `xcode-select --print-path`/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib
+```
 
+当然，你需要添加这个目录到你的runpath，这样动态链接才能在runtime的时候找到这个库。如果你是通过终端来做build，你可以在库的路径前加上`-rpath`参数。链接的时候你需要将参数传递完整，像下面这样：
+```bash
     clang `xcode-select --print-path`/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib -rpath `xcode-select --print-path`/Toolchains/XcodeDefault.xctoolchain/usr/lib ...
-Getting the Headers
-Unfortunately, Xcode doesn't ship the headers for this library. The good news is that it's intended to provide a stable API, and so you can just go fetch the headers from the Clang project's subversion repository. The C headers for libclang can be found here:
-
-http://llvm.org/svn/llvm-project/cfe/trunk/include/clang-c/
-
-You can easily grab a local copy for yourself:
+```
+##获取头文件
+坏消息是，Xcode没有提供这个库的头文件。好消息是因为使用的是稳定的API版本，所以你可以从Clang项目的版本库里面获取头文件。libclang的C版本头文件可以在这里找到：[http://llvm.org/svn/llvm-project/cfe/trunk/include/clang-c/][2]。你也可以使用svn获取一份本地拷贝：
 
     svn export http://llvm.org/svn/llvm-project/cfe/trunk/include/clang-c/
-Documentation
+##文档
 Documentation for libclang can be found here:
-
-http://clang.llvm.org/doxygen/group__CINDEX.html
+libclang的相关文档可以在这里找到：[http://clang.llvm.org/doxygen/group__CINDEX.html][3]。
 
 The C API is done in a fairly reasonable object-oriented style and is fairly easy to follow. I couldn't find any master overview document that discusses how to get started, but that's what this article is for!
 

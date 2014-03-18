@@ -19,7 +19,7 @@ categories: iOS开发 Clang
 1. Clang静态分析工具的介绍
 2. Clang静态分析工具的使用方法
 
-Clang是什么？
+Clang是什么
 ---
 
 Clang是[LLVM][2]项目的一部分。LLVM本质上其实是编译器和JIT虚拟机非常重要的一个框架。
@@ -42,12 +42,14 @@ Clang静态分析工具，the Clang Static Analyzer（大家一般都直接使�
 Where Is It?
 The main CSA web page can be found at http://clang.llvm.org/StaticAnalysis.html, and it can be downloaded using the link at the bottom right. I won't link directly to the download because it's still in very active development and so the download link updates frequently.
 
-它在哪儿？
+它在哪儿
 ---
 它的主页在~~[http://clang.llvm.org/StaticAnalysis.html][3]~~ [http://clang.llvm.org/][4]。你可以在主页里下载。
 
-How To Use It
-Using CSA is extremely easy. It provides a scan-build command which you simply invoke at the command line, passing the command to build your code as the parameters. scan-build will do some funky business to convince gcc to pass control over to CSA as it builds, allowing CSA to analyze all of your code instead of actually getting it built.
+如何使用
+---
+scan-build will do some funky business to convince gcc to pass control over to CSA as it builds, allowing CSA to analyze all of your code instead of actually getting it built.
+CSA使用非常简单。它提供了一个scan-build命令，你可以简单的在终端使用它来build你的代码。scan-build也会将
 
 Since an example is worth a thousand words:
 
