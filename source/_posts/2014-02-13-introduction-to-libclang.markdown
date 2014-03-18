@@ -34,7 +34,7 @@ Clang的库版本，创造性的叫做libclang（很显然的= =）。Xcode使�
 ##文档
 Documentation for libclang can be found here:
 libclang的相关文档可以在这里找到：[http://clang.llvm.org/doxygen/group__CINDEX.html][3]。
-
+C版本的API已经很完善了，并且以OO的风格去写，很容易看懂。
 The C API is done in a fairly reasonable object-oriented style and is fairly easy to follow. I couldn't find any master overview document that discusses how to get started, but that's what this article is for!
 
 Getting Started
