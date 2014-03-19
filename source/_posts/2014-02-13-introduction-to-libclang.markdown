@@ -32,16 +32,18 @@ Clang的库版本，创造性的叫做libclang（很显然的= =）。Xcode使�
 
     svn export http://llvm.org/svn/llvm-project/cfe/trunk/include/clang-c/
 ##文档
-Documentation for libclang can be found here:
 libclang的相关文档可以在这里找到：[http://clang.llvm.org/doxygen/group__CINDEX.html][3]。
-C版本的API已经很完善了，并且以OO的风格去写，很容易看懂。
-The C API is done in a fairly reasonable object-oriented style and is fairly easy to follow. I couldn't find any master overview document that discusses how to get started, but that's what this article is for!
+C版本的API已经很完善了，并且以OO的风格去写，很容易看懂。令我费解的是，怎么也找不到类似`Getting Started`的相关说明文档，这也是促成了我写这篇文章的原因之一。
 
-Getting Started
-The top-level object where everything else starts is called an index. Although it does more, libclang was originally built to help with code completion and indexing source files, and it looks like the name came from that. Creating an index is pretty easy:
+##开始
+在所有其他工作之前，我们首先需要创建一个index。这个是最先要做的——当然，libclang本来的作用就是代码补全和索引源代码。看起来它的名字也可能跟这个有关。
+
+创建一个index很简单：
 
     CXIndex index = clang_createIndex(0, 0);
-The two parameters are boolean options. The first one determines whether declarations from PCH files are excluded. that doesn't really matter for my purposes, since I'm not using a PCH, but not excluding them seems like a decent start. The second parameter determines whether diagnostics are printed when parsing source code. If set, libclang will print warnings and errors just like the compiler would. I disabled this so that I can take control of how diagnostics are shown.
+
+这个方法中的两个参数是布尔类型的选项：
+1. 第一个参数决定了PCH文件中的声明是否被排除。这个参数跟我没有关系，因为我没有使用PCH，不过选择不把声明排除在外是一个低调的开始；2. 第二个参数决定了解析代码过程中是否打印诊断信息。如果设置了，libclang会将警告和错误打印出来，就像编译器一样。我选择关掉它，这样我就可以自由地控制要打印出的信息。
 
 Next comes parsing a translation unit. In C terminology, a translation unit is basically a single compiled source file. Parsing a translation unit with libclang is much like compiling a file. It's so similar that you give the function command-line arguments just like you'd give them to clang on the command line. Let's start off with the arguments, which are just a couple of include paths needed to make the code compile properly:
 
