@@ -89,23 +89,27 @@ Thread 1:
 
 让我们用两个简短的例子来看下重新符号映射前后的差别。
 
-####// 符号映射之前
+// 符号映射之前
+
     8 OurApp 0x000029d4 0x1000 + 6612
-The first column gives us the index of the stack frame in the stack trace. The second column indicates the name of the binary the function belongs to. The third column tells us the address of the function that was called in the process’ address space. The last column divides this into a base address for the library’s binary image (see section Binary Images) and an offset.
+第一个列的数字代表这一栈帧在堆栈信息中的索引。第二列代表这个函数名称所属的程序的名称。第三列表示这个被调用函数的地址。最后面的两个部分是这个库的二进制映像的基地址以及偏移量。
 
-We can see that this is not all that intuitive. Let’s look at the same example after symbolication:
+可以看到这并不直观，让我们再来看下符号化后的结果：
 
-####// 符号映射之后
+// 符号映射之后
+
     8 OurApp 0x000029d4 -[OurAppDelegate applicationDidFinishLaunching:] (OurAppDelegate.m:128)
-The first three columns are the same. The last column however, contains the actual file name, line number, and function name, which we humans can more easily look up.
+前面三个字段跟之前的一样，后面实际上就是代码的文件，行号，函数名，很容易理解。
 
-The Exception Section
-The exception section of a crash report provides us with the exception type, the exception codes, and the index of the thread where the crash occurred:
+##The Exception Section
+异常信息这部分，提供了：异常类型，异常代码，以及出现异常的线程：
 
-Exception Type: SIGABRT
-Exception Codes: #0 at 0x3466e32c
-Crashed Thread: 0
-When we talk about ‘exceptions’ in this context, we do not refer to Objective-C exceptions (although those may be reason for a crash), but Mach Exceptions. The example also shows a UNIX signal, SIGABRT, which many UNIX programmers will find familiar. There is a whole ecosystem of APIs built around Mach Exceptions and UNIX signals (e.g. to attach custom signal/exception handlers to given types of UNIX signals/Mach Exceptions), that we’re not going to cover here. If you’re interested, see the Further Reading section below.
+	Exception Type: SIGABRT
+	Exception Codes: #0 at 0x3466e32c
+	Crashed Thread: 0
+
+我们这里谈论的“异常”，不是Objective-C类型的异常（尽管有时候的确是导致crash的原因），而是Mach类型异常。例子中给的异常类型是一个UNIX信号——SIGABRT，这对于很多UNIX程序员来说会比较熟悉。围绕Mach异常和UNIX信号，已经建立了很完整api的生态系统，我们这里不去介绍，如果你有兴趣，可以在最下面*阅读更多*。
+There is a whole ecosystem of APIs built around Mach Exceptions and UNIX signals (e.g. to attach custom signal/exception handlers to given types of UNIX signals/Mach Exceptions), that we’re not going to cover here. If you’re interested, see the Further Reading section below.
 
 The kernel will send such exceptions and signals under a variety of circumstances. For the sake of brevity, we limit our discussion to the most common ones that either lead to process termination or that are otherwise of interest in the face of crash analysis.
 
