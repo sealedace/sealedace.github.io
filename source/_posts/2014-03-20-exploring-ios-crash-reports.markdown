@@ -109,20 +109,45 @@ Thread 1:
 	Crashed Thread: 0
 
 我们这里谈论的“异常”，不是Objective-C类型的异常（尽管有时候的确是导致crash的原因），而是Mach类型异常。例子中给的异常类型是一个UNIX信号——SIGABRT，这对于很多UNIX程序员来说会比较熟悉。围绕Mach异常和UNIX信号，已经建立了很完整api的生态系统，我们这里不去介绍，如果你有兴趣，可以在最下面*阅读更多*。
-There is a whole ecosystem of APIs built around Mach Exceptions and UNIX signals (e.g. to attach custom signal/exception handlers to given types of UNIX signals/Mach Exceptions), that we’re not going to cover here. If you’re interested, see the Further Reading section below.
 
-The kernel will send such exceptions and signals under a variety of circumstances. For the sake of brevity, we limit our discussion to the most common ones that either lead to process termination or that are otherwise of interest in the face of crash analysis.
+系统内核在很多情形下会发送一些exception和signal。为了简洁起见，我们只讨论一些常见的，导致进程终止，或者crash中感兴趣的部分进行分析。
 
-Signals
-The following is a list of commonly encountered, process-terminating signals and a brief description:
+##Signals
+下面是常遇到的，进程终止的signal一个清单：
 
-Signal	Description
-SIGILL	Attempted to execute an illegal (malformed, unknown, or privileged) instruction. This may occur if your code jumps to an invalid but executable memory address.
-SIGTRAP	Mostly used for debugger watchpoints and other debugger features.
-SIGABRT	Tells the process to abort. It can only be initiated by the process itself using the abort() C stdlib function. Unless you’re using abort() yourself, this is probably most commonly encountered if an assert() or NSAssert() fails.
-SIGFPE	A floating point or arithmetic exception occurred, such as an attempted division by zero.
-SIGBUS	A bus error occurred, e.g. when trying to load an unaligned pointer.
-SIGSEGV	Sent when the kernel determines that the process is trying to access invalid memory, e.g. when an invalid pointer is dereferenced.
+
+
+<table>
+   <tr>
+      <td>Signal</td>
+      <td>Description</td>
+   </tr>
+   <tr>
+      <td>SIGILL</td>
+      <td><div style="text-align:left">尝试去执行一个非法的（奇怪的，未知的，有特权的）指令。出现条件是，如果你的代码执行到一个无效的但可执行的内存地址。</div></td>
+   </tr>
+   <tr>
+      <td>SIGTRAP</td>
+      <td><div style="text-align:left">通常用于debugger断点和其他的debugger功能。</div></td>
+   </tr>
+   <tr>
+      <td>SIGABRT</td>
+      <td>告诉进程终止。它只能被进程自己调用<code>abort()</code>这个C标准库函数来初始化。除非你自己使用<code>abort()</code>，大部分情况是你使用了<code>assert()</code>或者<code>NSAssert()</code>失败后产生的。</td>
+   </tr>
+   <tr>
+      <td>SIGFPE</td>
+      <td>A floating point or arithmetic exception occurred, such as an attempted division by zero.</td>
+   </tr>
+   <tr>
+      <td>SIGBUS</td>
+      <td>A bus error occurred, e.g. when trying to load an unaligned pointer.</td>
+   </tr>
+   <tr>
+      <td>SIGSEGV</td>
+      <td>Sent when the kernel determines that the process is trying to access invalid memory, e.g. when an invalid pointer is dereferenced.</td>
+   </tr>
+</table>
+
 A signal has either a default signal handler, or a custom one (if the program set it up using sigaction). As the second argument to the signal handler, a siginfo_t structure is passed that contains further information about the error that occurred. Of special interest is the si_addr field, which indicates the address at which the fault occurred. The following is a quote of a comment from the kernel’s bsd/sys/signal.h file:
 
 When the signal is SIGILL or SIGFPE, si_addr contains the address of the faulting
