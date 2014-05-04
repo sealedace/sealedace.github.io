@@ -132,29 +132,40 @@ Thread 1:
    </tr>
    <tr>
       <td>SIGABRT</td>
-      <td>告诉进程终止。它只能被进程自己调用<code>abort()</code>这个C标准库函数来初始化。除非你自己使用<code>abort()</code>，大部分情况是你使用了<code>assert()</code>或者<code>NSAssert()</code>失败后产生的。</td>
+      <td><div style="text-align:left">告诉进程终止。它只能被进程自己调用<code>abort()</code>这个C标准库函数来初始化。除非你自己使用<code>abort()</code>，大部分情况是你使用了<code>assert()</code>或者<code>NSAssert()</code>失败后产生的。</div></td>
    </tr>
    <tr>
       <td>SIGFPE</td>
-      <td>A floating point or arithmetic exception occurred, such as an attempted division by zero.</td>
+      <td><div style="text-align:left">浮点或计算异常，比如除0的情况。</div></td>
    </tr>
    <tr>
       <td>SIGBUS</td>
-      <td>A bus error occurred, e.g. when trying to load an unaligned pointer.</td>
+      <td><div style="text-align:left">总线错误。比如尝试加载一个未对齐的指针。</div></td>
    </tr>
    <tr>
       <td>SIGSEGV</td>
-      <td>Sent when the kernel determines that the process is trying to access invalid memory, e.g. when an invalid pointer is dereferenced.</td>
+      <td><div style="text-align:left">当内核发现进程尝试去访问无效的内存地址时，发送该信号。比如，放一个无效指针所指向的内容。</div></td>
    </tr>
 </table>
 
-A signal has either a default signal handler, or a custom one (if the program set it up using sigaction). As the second argument to the signal handler, a siginfo_t structure is passed that contains further information about the error that occurred. Of special interest is the si_addr field, which indicates the address at which the fault occurred. The following is a quote of a comment from the kernel’s bsd/sys/signal.h file:
+一个信号有一个默认的信号处理函数或者是一个自定义的处理函数(使用`sigaction`来实现)。信号处理函数的第二个入参，是一个siginfo_t结构体，用来传入发生错误时更详细的相关信息。我们特别关注的是`si_addr`字段，它代表错误所发生的地址。下面引用了一段从内核的bsd/sys/signal.h文件中一段注释：
 
+```
 When the signal is SIGILL or SIGFPE, si_addr contains the address of the faulting
 instruction. When the signal is SIGSEGV or SIGBUS, si_addr contains the address of
 the faulting memory reference. Although for x86 there are cases of SIGSEGV for
 which si_addr cannot be determined and is NULL.
-Exceptions
+
+```
+翻译：
+
+
+    当信号是SIGILL或者SIGFPE时，si_addr包含了错误指示的地址。当信号是SIGSEGV或者SIGBUS时，
+    si_addr包含了错误内存的引用的地址。尽管对于x86来说，有很多种SIGSEGV的情况下，si_addr不能被发现并且
+    传递的是NULL。
+
+
+##Exceptions
 On Darwin, UNIX signals are built on top of Mach Exceptions, and the kernel performs some mapping between the two. For a more comprehensive list of exception types, see osfmk/mach/exception_types.h. Again, we list only the most important exception types:
 
 Exception	Description
