@@ -166,15 +166,30 @@ which si_addr cannot be determined and is NULL.
 
 
 ##Exceptions
-On Darwin, UNIX signals are built on top of Mach Exceptions, and the kernel performs some mapping between the two. For a more comprehensive list of exception types, see osfmk/mach/exception_types.h. Again, we list only the most important exception types:
+在Darwin上，UNIX信号是创建在Mach异常的最顶层，同时，内核在两者之间做了一些映射。更多的异常类型，可以查看`osfmk/mach/exception_types.h`文件。再一次，我们仅仅列出了最重要的异常类型：
 
-Exception	Description
-EXC_BAD_ACCESS	Memory could not be accessed. The memory address where an access attempt was made is provided by the kernel.
-EXC_BAD_INSTRUCTION	Instruction failed. Illegal or undefined instruction or operand.
-EXC_ARITHMETIC	For arithmetic errors. The exact nature of the problem is also made available.
-It is also possible for an exception to have an associated exception code that contains further information about the problem. For instance, EXC_BAD_ACCESS could point to a KERN_PROTECTION_FAILURE, which would indicate that the address being accessed is valid, but does not permit the required form of access (seeosfmk/mach/kern_return.h). EXC_ARITHMETIC exceptions will also include the precise nature of the problem as part of the exception code.
+<table>
+   <tr>
+      <td>Exception</td>
+      <td>Description</td>
+   </tr>
+   <tr>
+      <td>EXC_BAD_ACCESS</td>
+      <td><div style="text-align:left">内存不可访问。尝试访问的地址是通过内核提供的。</div></td>
+   </tr>
+   <tr>
+      <td>EXC_BAD_INSTRUCTION</td>
+      <td><div style="text-align:left">指令失败。非法或者未定义的指令或者运算。</div></td>
+   </tr>
+   <tr>
+      <td>EXC_ARITHMETIC</td>
+      <td><div style="text-align:left">算法错误。</div></td>
+   </tr>
+</table>
 
-Example
+当然，也有可能一个异常有一个相关的异常代码，这个异常代码包含了问题的一些信息。举一个例子，`EXC_BAD_ACCESS`可能指向一个代码叫`KERN_PROTECTION_FAILURE`，它暗示着，被访问的地址是有效的，但是权限不够，不能够访问（查看osfmk/mach/kern_return.h）。EXC_ARITHMETIC类型的异常可以包含问题的本质作为异常代码的一部分。
+
+####Example
 The example exception section shown above is an excerpt from this crash report. We can see that the reason for the crash is a SIGABRT, which makes us think that this crash might have been caused by a failing assertion. If we inspect the exception code, we can see that the kernel included the address of the instruction in question (0x3466e32c), and the crashed thread’s index. Sure enough, if we search for that address in the report, we’ll find it in both the program counter register (see below), and the crashing thread’s stack trace:
 
 0 libsystem_kernel.dylib 0x3466e32c ___pthread_kill + 8
