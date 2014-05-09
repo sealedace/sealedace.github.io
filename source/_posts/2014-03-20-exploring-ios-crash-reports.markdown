@@ -9,6 +9,7 @@ categories: iOS
 
 
 [original article]: https://www.plausible.coop/blog/?p=176
+[crash report]: https://gist.github.com/dennda/56851a63d935b54d3147
 
 #####注：本文译自[Exploring iOS Crash Reports][original article]。
 
@@ -190,7 +191,7 @@ which si_addr cannot be determined and is NULL.
 当然，也有可能一个异常有一个相关的异常代码，这个异常代码包含了问题的一些信息。举一个例子，`EXC_BAD_ACCESS`可能指向一个代码叫`KERN_PROTECTION_FAILURE`，它暗示着，被访问的地址是有效的，但是权限不够，不能够访问（查看osfmk/mach/kern_return.h）。EXC_ARITHMETIC类型的异常可以包含问题的本质作为异常代码的一部分。
 
 ####Example
-The example exception section shown above is an excerpt from this crash report. We can see that the reason for the crash is a SIGABRT, which makes us think that this crash might have been caused by a failing assertion. If we inspect the exception code, we can see that the kernel included the address of the instruction in question (0x3466e32c), and the crashed thread’s index. Sure enough, if we search for that address in the report, we’ll find it in both the program counter register (see below), and the crashing thread’s stack trace:
+上面的异常示例内容来自于这份[crash report][crash report]。我们能看到crash的原因是`SIGABRT`，这让我们想到可能是断言（assert）导致的。If we inspect the exception code, we can see that the kernel included the address of the instruction in question (0x3466e32c), and the crashed thread’s index. Sure enough, if we search for that address in the report, we’ll find it in both the program counter register (see below), and the crashing thread’s stack trace:
 
 0 libsystem_kernel.dylib 0x3466e32c ___pthread_kill + 8
 In this example, we can see that there’s even more to discover in the ‘Application Specific Information’ section, which tells us that a NSInternalInconsistencyException (a Foundation exception) occurred which was not caught and led to a call to abort(), which is ultimately why we saw the SIGABRT signal.
