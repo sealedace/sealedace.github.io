@@ -191,13 +191,14 @@ which si_addr cannot be determined and is NULL.
 当然，也有可能一个异常有一个相关的异常代码，这个异常代码包含了问题的一些信息。举一个例子，`EXC_BAD_ACCESS`可能指向一个代码叫`KERN_PROTECTION_FAILURE`，它暗示着，被访问的地址是有效的，但是权限不够，不能够访问（查看osfmk/mach/kern_return.h）。EXC_ARITHMETIC类型的异常可以包含问题的本质作为异常代码的一部分。
 
 ####Example
-上面的异常示例内容来自于这份[crash report][crash report]。我们能看到crash的原因是`SIGABRT`，这让我们想到可能是断言（assert）导致的。If we inspect the exception code, we can see that the kernel included the address of the instruction in question (0x3466e32c), and the crashed thread’s index. Sure enough, if we search for that address in the report, we’ll find it in both the program counter register (see below), and the crashing thread’s stack trace:
+上面的异常示例内容来自于这份[crash report][crash report]。我们能看到crash的原因是`SIGABRT`，这让我们想到可能是断言（assert）导致的。如果我们仔细观察分析这个异常的代码，我们可以看到内核包含了问题所在的地址（0x3466e32c），以及crash的线程索引。非常肯定的是，如果我们在报告中搜索这个地址，我们会发现它同时存在于程序计数寄存器，和crash的线程堆栈信息：
+	
+	0 libsystem_kernel.dylib 0x3466e32c ___pthread_kill + 8
+	
+在这个例子中，我们看到在'Application Specific Information'部分可以找到更多的信息。这些信息告诉我们一个叫NSInternalInconsistencyException（一种Foundation异常）的异常出现了，但是没有被捕获到，而它是导致了程序的退出的原因，这也就是为什么我们最终看到的是SIGABRT信号。
 
-0 libsystem_kernel.dylib 0x3466e32c ___pthread_kill + 8
-In this example, we can see that there’s even more to discover in the ‘Application Specific Information’ section, which tells us that a NSInternalInconsistencyException (a Foundation exception) occurred which was not caught and led to a call to abort(), which is ultimately why we saw the SIGABRT signal.
-
-Binary Images
-At the end of a crash report, we find a list of the loaded binary images, which in essence tells us which libraries were loaded by the application, and what their address space is within the process. Each entry in this list also shows the UUID for the respective binary, which is generated and set by the linker as part of the build process. It is stored in the Mach-O binary and identified by the LC_UUID command. The UUID is the same for the binary and the .dSYM bundle generated for it, which ensures that there’s no mismatch during symbolication.
+###Binary Images
+在报告的最后，我们发现了一个记录了加载二进制图片数据的列表，它告诉了我们哪些库被加载了，以及它们在这个进程中的地址空间。这个列表中每一项也记录了标记各自二进制数据的UUID，这些UUID由链接器生成并分配，同时这个步骤也变成了build过程的一部分。 It is stored in the Mach-O binary and identified by the LC_UUID command. The UUID is the same for the binary and the .dSYM bundle generated for it, which ensures that there’s no mismatch during symbolication.
 
 For example, we might find the following in the list of binary images:
 
