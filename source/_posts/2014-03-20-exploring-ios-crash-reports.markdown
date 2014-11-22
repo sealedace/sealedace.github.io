@@ -47,7 +47,6 @@ Report Version: 104
 上面大部分的信息可以从字面上理解是什么意思，但是有几个需要解释下：
 
 * **Incident Identifier**: 客户端为crash report分配的唯一标识。
-
 * **CrashReporter Key**: 这个是客户端分配的，匿名的，并且每一个设备一个的id，有点类似UDID。这个主要为了方便统计该问题的普遍性。
 * **Hardware Model**: 这个是出现crash的机器型号。这个主要用于在重现一些只在某些指定机型的机器上出现的问题，不过，这种情况不多。
 * **Code Type**: 这个是目标机器的处理器类型。在iOS设备上，这个永远都是`ARM`，不管是`ARMv7`或者`ARMv7s`。
@@ -195,56 +194,66 @@ which si_addr cannot be determined and is NULL.
 	
 	0 libsystem_kernel.dylib 0x3466e32c ___pthread_kill + 8
 	
-在这个例子中，我们看到在'Application Specific Information'部分可以找到更多的信息。这些信息告诉我们一个叫NSInternalInconsistencyException（一种Foundation异常）的异常出现了，但是没有被捕获到，而它是导致了程序的退出的原因，这也就是为什么我们最终看到的是SIGABRT信号。
+在这个例子中，我们看到在'Application Specific Information'部分可以找到更多的信息。这些信息告诉我们一个叫`NSInternalInconsistencyException`（一种Foundation异常）的异常出现了，但是没有被捕获到，而它是导致了程序的退出的原因，这也就是为什么我们最终看到的是SIGABRT信号。
 
 ###Binary Images
-在报告的最后，我们发现了一个记录了加载二进制图片数据的列表，它告诉了我们哪些库被加载了，以及它们在这个进程中的地址空间。这个列表中每一项也记录了标记各自二进制数据的UUID，这些UUID由链接器生成并分配，同时这个步骤也变成了build过程的一部分。 It is stored in the Mach-O binary and identified by the LC_UUID command. The UUID is the same for the binary and the .dSYM bundle generated for it, which ensures that there’s no mismatch during symbolication.
+在报告的最后，我们发现了一个记录了加载二进制镜像数据的列表，它告诉了我们哪些库被加载了，以及它们在这个进程中的地址空间。这个列表中每一项也记录了标记各自二进制数据的UUID，这些UUID由链接器生成并分配，同时这个步骤也变成了build过程的一部分。它被`LC_UUID`命令分配了UUID，并且存储在了Mach-O文件中。这个UUID跟`.dSYM`生成的是一样的，这样保证了在符号化的过程中不会出现不匹配。
 
-For example, we might find the following in the list of binary images:
+举个例子，我们不难找到类似下面的二进制镜像：
 
+```
 0x35f62000 - 0x36079fff CoreFoundation armv7 /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation
-The first two hexadecimal numbers indicate the beginning and end of the address space that the CoreFoundation image is loaded into. If we consider a line from a stack trace such as the following, we can see that the function that was traced falls into this library’s address space:
+```
 
+前面的两个十六进制的数字表示CoreFoundation库加载内存中的起始地址和末尾地址。
+
+如果我们假设在栈列表中有如下的信息，我们可以看到追踪到的函数落在这个库（CoreFoundation）的地址空间内：
+```
 9 CoreFoundation 0x35fee2ad ___CFRunLoopRun + 1269
-When is this information useful? Imagine that for some reason we desire to analyze the assembly of one of the libraries that our application is using, let’s say CoreFoundation. CoreFoundation is not statically linked (i.e. it’s not part of the application’s own binary), but is dynamically loaded at runtime. When such loading occurs, the library’s binary image ends up at some arbitrary location in the process’ address space.
+```
 
-Let’s now assume that we know the value of the program counter (PC, i.e. the address of the instruction to be executed next) of the process, and that the PC refers to an instruction somewhere in CoreFoundation’s address space, relative to the process. If on our development machine we disassemble a local, on-disk copy of the CoreFoundation binary that the application previously loaded, we’d not be able to map the process-relative PC to the address space of the local copy, given that CoreFoundation was mapped to some arbitrary address. If, however, we know the offset the CoreFoundation binary image was at during the process’ lifetime, we can easily map the process-relative PC to the corresponding value for the on-disk binary.
+这些信息什么时候对我们有用？想象下一种情况，我们急需分析其中一个应用中正在使用的库，就拿CoreFoundation来说。CoreFoundation并不是静态链接（也就是说，它不被包含在app的二进制文件里面），它是在runtime的时候被动态加载的。当出现这种动态加载的时候，库的二进制数据在进程的地址空间的位置是随机的。
 
-As an example, if CoreFoundation’s binary image was loaded into our process with an offset of 0x35f62000, and the PC is 0x35fee2ad, then we can compute the actual address of the CoreFoundation instruction as:
+现在让我们假设已知当前程序计数器的值（PC，下一个被执行的指令的地址），并且PC指向相对于进程的CoreFoundation的地址空间中某一条指令的位置。如果我们开发机器使用了一份应用程序已经加载本地磁盘上CoreFoundation库的拷贝，我们是不能把相对进程的PC映射到本地拷贝库的地址空间的，因为CoreFoundation是被加载到一个随机的地址上的。不管怎样，假如，我们知道了CoreFoundation库二进制数据在进程生命周期中的地址偏移量，我们可以容易地将相对进程的PC映射到对应的磁盘上的二进制数据。
 
-0x35fee2ad - 0x35f62000 == 0x8c2ad
-In our locally disassembled CoreFoundation binary, we can now inspect the instruction at address 0x8c2ad.
+举个例子，如果CoreFoundation的库被加载到我们的进程中的地址偏移量是0x35f62000，并且PC是0x35fee2ad，这样我们可以计算出CoreFoundation指令的实际地址为：
 
-Register State
-Further down in the crash report we find the ARM thread state of the crashed thread, which is essentially a list of the CPU registers and their respective values at the time of the crash. The section may look like so:
+	0x35fee2ad - 0x35f62000 == 0x8c2ad
+在本地CoreFoundation库文件中，我们现在可以查看到地址为0x8c2ad的指令了。
 
+####Register State
+进一步的深入下去，我们找到了ARM线程在crash的时候的状态。其实本质上就是一张表，上面列出了CPU寄存器以及它们在crash的时候的状态值。类似下面这段：
+
+```
 Thread 0 crashed with ARM Thread State:
 r0: 0x00000000 r1: 0x00000000 r2: 0x00000001 r3: 0x00000000
 r4: 0x00000006 r5: 0x3f09cd98 r6: 0x00000002 r7: 0x2fe80a70
 r8: 0x00000001 r9: 0x00000000 r10: 0x0000000c r11: 0x00000001
 ip: 0x00000148 sp: 0x2fe80a64 lr: 0x3526f20f pc: 0x3466e32c
 cpsr: 0x00000010
-A crashing thread’s register state is not always required to read a crash report, but there are certainly instances where this information can be very useful. For instance, if the crashing instruction tries to access a register that has a value of 0x0, and the thread tries to access memory at that register’s address or with only a small offset the failure cause is extremely likely to be a NULL dereference. That’s because the entire page from 0-4095 is mapped with read/write/execution permissions disabled, i.e. no access is allowed.
+```
+当我们拿到crash报告阅读分析的时候，上面的信息一般是用不到的。但是，在某些特定的情况下，这些信息对我们也许是非常有用的。比如，导致crash的那条指令正在访问一个值为0x0的寄存器，并且线程正在访问那个寄存器地址（或者有非常小偏移的地址）的内存，这个将会导致类似一种对NULL取值的情况。因为整个页面从0-4095都是被映射为非读/写/执行的权限，也就是说是禁止任何访问的。
 
-In the following section, we’ll give another more elaborate example.
+在下面的段落中，我们将给出一个更详细的例子。
 
-An Example
-Let us now consider a contrived example that illustrates why it can be handy to have the register state of a crashing application.
+####An Example
+我们现在来考虑一种情况，为什么在应用崩溃的时候知道寄存器的状态会对我们有帮助。
 
-Assume that the crash report tells us the thread that the crash happened in, and that we’ve identified the line in our program that causes the crash. Imagine that the line reads as such:
+假设crash report告诉了我们程序crash的线程，并且我们已经定位到了导致crash的那行代码。假设这行代码如下：
 
-new_data->ptr2 = [myObject executeSomeMethod:old_data->ptr2];
-If we consider the UNIX signal that got sent (SIGSEGV), we can guess that the crash happened due to the application trying to dereference a memory address that for some reason is invalid. In this example, there are two pointers being evidently dereferenced (new_data and old_data). The question then becomes: Which one is responsible for the crash?
+	new_data->ptr2 = [myObject executeSomeMethod:old_data->ptr2];
+如果发送出的UNIX信号为`SIGSEGV`，我们可以猜到程序崩溃的原因是，程序在对一个无效的内存地址进行取值操作。很明显地，在这个例子中有两个指针在被执行取值操作（new_data和old_data）。那么，现在的问题变成了：是哪一个导致了crash？
 
-Assembly to the Rescue
-If we still have a copy of the crashing binary, we can disassemble it and look at the exact instruction that was being executed when the application crashed (the address of which is made available as part of the SIGSEGV’ssi_addr).
+####Assembly to the Rescue
+如果我们手头上仍然保留了一份崩溃的程序的拷贝，我们可以分解它，然后找到那个在程序崩溃的时候正在执行的指令（也就是SIGSEGV的si_addr的部分可用的地址）。
 
-Assume that the application at the time of crashing was executing the following ARM instruction:
+假设程序在崩溃的时候执行如下的ARM指令：
 
-str r0, [r1, #4]
-There are two registers being used here: r0 and r1. Imagine that r1 points to the address of a C struct with the following declaration:
+	str r0, [r1, #4]
+这里有2个寄存器正在被使用：`r0`和`r1`。想象r1指向的地址是一个如下定义的C结构体：
 
-typedef struct { void *ptr1, void *ptr2 } data_t;
+	typedef struct { void *ptr1, void *ptr2 } data_t;
+接着，鉴于ARM上的指针长度位是4字节，我们知道r1加上4指向了结构体成员`ptr2`。
 Then, given that pointers on ARM have a width of 4 bytes, we know that r1 plus four refers to the struct memberptr2.
 
 In the form above, the str instruction takes the value stored in register r0 and attempts to store it at the address pointed to by r1, plus four. We could read the assembly like so:
