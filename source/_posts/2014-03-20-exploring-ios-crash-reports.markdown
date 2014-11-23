@@ -236,7 +236,7 @@ cpsr: 0x00000010
 
 在下面的段落中，我们将给出一个更详细的例子。
 
-####An Example
+#####An Example
 我们现在来考虑一种情况，为什么在应用崩溃的时候知道寄存器的状态会对我们有帮助。
 
 假设crash report告诉了我们程序crash的线程，并且我们已经定位到了导致crash的那行代码。假设这行代码如下：
@@ -244,7 +244,7 @@ cpsr: 0x00000010
 	new_data->ptr2 = [myObject executeSomeMethod:old_data->ptr2];
 如果发送出的UNIX信号为`SIGSEGV`，我们可以猜到程序崩溃的原因是，程序在对一个无效的内存地址进行取值操作。很明显地，在这个例子中有两个指针在被执行取值操作（new_data和old_data）。那么，现在的问题变成了：是哪一个导致了crash？
 
-####Assembly to the Rescue
+######Assembly to the Rescue
 如果我们手头上仍然保留了一份崩溃的程序的拷贝，我们可以分解它，然后找到那个在程序崩溃的时候正在执行的指令（也就是SIGSEGV的si_addr的部分可用的地址）。
 
 假设程序在崩溃的时候执行如下的ARM指令：
@@ -254,25 +254,24 @@ cpsr: 0x00000010
 
 	typedef struct { void *ptr1, void *ptr2 } data_t;
 接着，鉴于ARM上的指针长度位是4字节，我们知道r1加上4指向了结构体成员`ptr2`。
-Then, given that pointers on ARM have a width of 4 bytes, we know that r1 plus four refers to the struct memberptr2.
+在的代码中，`str`这个指令将r0中的值存储到r1中的地址加上4的地址里。我们可以转换一下，如下：
 
-In the form above, the str instruction takes the value stored in register r0 and attempts to store it at the address pointed to by r1, plus four. We could read the assembly like so:
+	*(r1 + 4) = r0;
+也就是说，我们可以把`str`理解等价成C格式的赋值。
 
-*(r1 + 4) = r0;
-That is, we can think of str being the equivalent of a C assignment here.
+现在，我们明白了两件事情：
 
-We now know two things:
+* 程序接收到**SIGSEGV**信号（无效地址访问）
+* 当在尝试存储一个值到某个地址偏移4的地方的时候，程序出现了crash
 
-The application received a SIGSEGV (invalid memory access we already knew this; see above).
-The crash happened while trying to store a value to some address with an offset of 4.
-At this point we should be able to suspect that the pointer value of new_data might not be what we were expecting it to be.
+这个时候，我们应该可以猜测到`new_data`的指针的值可能并不是我们所期望的那个值。
+从这个ARM线程的状态中（即，寄存器和它们的值），我们可以确定这样的理论：
 
-Looking at the ARM thread state (the registers and their respective values), we can confirm this theory:
+	r1: 0x00000000
+换句话说，我们现在可以确定的是我们正在尝试对一个各种可能性指向无效内存的地址（根据对NULL指针和偏移量计算得来的地址）进行取值操作。这个就是导致应用crash的根本原因。如果这个例子放在现实中的话，那么我们下一步要做的就是查看我们的代码，并找到让代码执行到`new_data == NULL`这行操作的路径，然后解决问题。
 
-r1: 0x00000000
-In other words, we can now be certain that we are trying to dereference an address (which was computed based on an offset and a NULL pointer) which in all likelihood points to invalid memory. This was ultimately why the application crashed. If this was a real example, the next step would be to look at our code and determine what path the code could have taken such that we ended up on the crashing line with new_data == NULL, and to fix that.
-
-Additional Notes
+######Additional Notes
+为了把问题分析到位，其实对`old_data`进行取值并不会导致crash，因为这种访问只做读取，没有写入（换句话说，我们不会遇到str指令）。
 To drive the point home, dereferencing old_data can’t be the cause of the crash, given that the access to it only involves reading the value, not writing it (i.e. we wouldn’t be seeing a str instruction). That said, one should not be confused when looking at a more complete list of ARM assembly instructions, where one might see an instruction such as
 
 str [r2, #4], r0
