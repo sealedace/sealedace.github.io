@@ -271,15 +271,15 @@ cpsr: 0x00000010
 换句话说，我们现在可以确定的是我们正在尝试对一个各种可能性指向无效内存的地址（根据对NULL指针和偏移量计算得来的地址）进行取值操作。这个就是导致应用crash的根本原因。如果这个例子放在现实中的话，那么我们下一步要做的就是查看我们的代码，并找到让代码执行到`new_data == NULL`这行操作的路径，然后解决问题。
 
 ######Additional Notes
-为了把问题分析到位，其实对`old_data`进行取值并不会导致crash，因为这种访问只做读取，没有写入（换句话说，我们不会遇到str指令）。
-To drive the point home, dereferencing old_data can’t be the cause of the crash, given that the access to it only involves reading the value, not writing it (i.e. we wouldn’t be seeing a str instruction). That said, one should not be confused when looking at a more complete list of ARM assembly instructions, where one might see an instruction such as
+为了把问题分析到位，其实对`old_data`进行取值并不会导致crash，因为这种访问只做读取，没有写入（换句话说，我们不会遇到str指令）。所以说，当我们看到一个完整的ARM的指令列表的时候不用感到迷惑，因为我们可能会遇到类似下面这样的指令：
 
-str [r2, #4], r0
-This is an example of how the argument is passed to the subroutine (assuming r2 points to a struct of typedata_t). That is, the value of the second struct member is stored in register r0 prior to jumping into the subroutine, which then performs its work.
+	str [r2, #4], r0
+这是一个例子，展示了参数是如何传到子程序的（假定r2指向一个`data_t`类型的结构体）。也就是说，这个结构体的第二个成员的值在跳转到子程序（执行后面的任务）之前被存储在r0寄存器中。
 
-When the subroutine is about to return (assuming the Apple ARM ABI), the return value of the function is placed in r0 (if it fits there). In the above case, that would be the value returned by the executeSomeMethod: call, which by the time the crashing instruction executes is already stored in r0.
+当子程序即将返回（假设Apple ARM ABI）的时候，这个函数的返回值存在r0（如果可以的话）。在上面的例子中，也就是`executeSomeMethod:`方法的返回值，与此同时，在执行致使程序crash的指令时，已经保存在了r0寄存器中了。
 
-Conclusion
+####Conclusion
+有一部分的crash我们容易理解。但是还有很多情况，需要对crash进行分析才能理解里面的数据。正因为如此，一份完整的crash报告正是我们想要的。
 A fair number of crashes are easy to comprehend. For many crashes, however, comprehensive data is required for crash analysis. In those cases, a reliable crash reporting facility is desirable. Since you can’t know in advance when a crash will occur, and because you might not be able to narrow the cause down without a report, it’s advisable to set up a crash reporting solution for your app early during development. Using iTunes Connect does get you crash reports, but you can’t use it before your app is on the App Store, which means it’s not suitable for beta testing.
 
 Using a service such as HockeyApp has the following advantages over iTunes Connect:
