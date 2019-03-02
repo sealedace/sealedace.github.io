@@ -3,7 +3,7 @@ layout: post
 title: "关于block坑爹的retain cycle"
 date: 2014-01-23 11:20:00 +0800
 comments: true
-categories: iOS开发
+categories: iOS
 ---
 
 [chuan1]: http://beyondvincent.com
