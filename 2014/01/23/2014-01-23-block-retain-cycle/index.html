@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="Chinese/English">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="我们知道在使用block时，必须避免出现retain cycle。如果写代码不仔细造成了retain cycle，就会出现内存泄露。即使Xcode有静态代码分析工具，但很多时候Xcode也不太靠谱，根本什么提示都没有，所以还是自己写代码多注意比较好。 （下文译自The Correct Way to Avoid Capturing Self in Blocks With ARC，有小改动）  201">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于block坑爹的retain cycle">
+<meta property="og:url" content="http://yoursite.com/2014/01/23/2014-01-23-block-retain-cycle/index.html">
+<meta property="og:site_name" content="SealedAce&#39;s Blog">
+<meta property="og:description" content="我们知道在使用block时，必须避免出现retain cycle。如果写代码不仔细造成了retain cycle，就会出现内存泄露。即使Xcode有静态代码分析工具，但很多时候Xcode也不太靠谱，根本什么提示都没有，所以还是自己写代码多注意比较好。 （下文译自The Correct Way to Avoid Capturing Self in Blocks With ARC，有小改动）  201">
+<meta property="og:locale" content="Chinese/English">
+<meta property="og:updated_time" content="2019-03-02T07:26:25.830Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于block坑爹的retain cycle">
+<meta name="twitter:description" content="我们知道在使用block时，必须避免出现retain cycle。如果写代码不仔细造成了retain cycle，就会出现内存泄露。即使Xcode有静态代码分析工具，但很多时候Xcode也不太靠谱，根本什么提示都没有，所以还是自己写代码多注意比较好。 （下文译自The Correct Way to Avoid Capturing Self in Blocks With ARC，有小改动）  201">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/01/23/2014-01-23-block-retain-cycle/">
+
+
+
+
+
+  <title>关于block坑爹的retain cycle | SealedAce's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="Chinese/English">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SealedAce's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/01/23/2014-01-23-block-retain-cycle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="SealedAce">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SealedAce's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关于block坑爹的retain cycle</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2014-01-23T11:20:00+08:00">
+                2014-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我们知道在使用block时，必须避免出现<code>retain cycle</code>。如果写代码不仔细造成了<code>retain cycle</code>，就会出现内存泄露。即使Xcode有静态代码分析工具，但很多时候Xcode也不太靠谱，根本什么提示都没有，所以还是自己写代码多注意比较好。</p>
+<p>（下文译自<a href="http://blog.random-ideas.net/?p=160" target="_blank" rel="noopener">The Correct Way to Avoid Capturing Self in Blocks With ARC</a>，有小改动）</p>
+<blockquote>
+<p>2019-3-2更新:</p>
+<p>原始链接的文章已经访问不到了😅</p>
+</blockquote>
+<p>以前避免<code>retain cycle</code>的方法大概像这样：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Bar *bar;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Baz *baz;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)aMethod</span><br><span class="line">&#123;</span><br><span class="line">    __block Foo *blockSelf = <span class="keyword">self</span>;</span><br><span class="line">    bar.block = ^</span><br><span class="line">    &#123;</span><br><span class="line">        [blockSelf.baz doSomething];</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>所有在block中被访问的变量都会被block保留，而上面这段代码的避免了对<code>self</code>的直接引用。如果self持有这个block——直接或者间接，都会导致<code>retain cycle</code>。因此，我们使用了<code>__block</code>关键字来创建一个对<code>self</code>的临时引用（非保留），我们在block会使用这个引用代替<code>self</code>来操纵对象。但是很不幸，ARC出现后废弃了这种方法并且将<code>__block</code>作用改成了跟<code>strong</code>关键字一样。所以，我们需要一个新的方法来解决这个问题。</p>
+<p>一个常见的（naive）方法就是像下面的代码一样去创建一个<code>weak</code>引用：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Bar *bar;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Baz *baz;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)aMethod</span><br><span class="line">&#123;</span><br><span class="line">    __<span class="keyword">weak</span> Foo *blockSelf = <span class="keyword">self</span>;</span><br><span class="line">    bar.block = ^</span><br><span class="line">    &#123;</span><br><span class="line">        [blockSelf.baz doSomething];</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>其实，这个跟之前的那个方法差不多是一样的，只是关键字变成了<code>__weak</code>。用这个引用放在block里面运行，没有<code>retain cycle</code>。但是不管怎样，这样做仍然有一些问题。</p>
+<p>问题是，当<code>self</code>在block执行期间或block执行之前被销毁了，会怎样呢？我们乍一看应该是没什么问题的：因为<code>blockSelf</code>是一个<code>weak</code>引用，它在销毁后会自动置空，而且对nil发送消息是不会发生任何情况的。对吧？</p>
+<p>嗯，如果block中的代码就这样简单，没有复杂的消息传递就结束了，也许倒也没什么问题。但是，假如<code>self</code>在这个block执行的期间，在其他线程里面被销毁了呢？假如在你block里面工作完成到一半的时候<code>self</code>就释放置nil了呢？难道你就这样放弃block中要做的事情，就这样丢着不管了吗？是啊！你这样做也许没有什么损失。呵呵，但是这里还真有一种更加糟糕情况潜伏着…</p>
+<p>请看下面这一段看起来感觉跟之前差不多的代码：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Bar *bar;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Baz *baz;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)aMethod</span><br><span class="line">&#123;</span><br><span class="line">    __<span class="keyword">weak</span> Foo *blockSelf = <span class="keyword">self</span>;</span><br><span class="line">    bar.block = ^</span><br><span class="line">    &#123;</span><br><span class="line">        [baz doSomething];</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>可以看到，这里我们是直接访问成员变量（很糟糕的方式），而没有通过Objective-C里面的推荐的成员访问器。这样写仍然会先访问到<code>self</code>，然后才能访问它的成员变量。如果你这样做的话，runtime没有使用成员访问器，而是使用了C级别的空指针引用。换种方式来看，上面的代码会变成大概下面这个样子：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Bar *bar;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Baz *baz;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)aMethod</span><br><span class="line">&#123;</span><br><span class="line">    __<span class="keyword">weak</span> Foo *blockSelf = <span class="keyword">self</span>;</span><br><span class="line">    bar.block = ^</span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="keyword">self</span>-&gt;baz doSomething];</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>所以，如果<code>self</code>在block执行的途中被销毁了，呵呵，你就会遇到一个因为使用了空指针来访问成员变量而导致的crash。这种情况，跟对nil发送消息可不一样，因为你根本就是在对一个不存在的东西发送消息。</p>
+<p>鉴于这些问题，最安全的做法是在block外部对<code>self</code>先获取一个<code>weak</code>引用，然在block内部执行代码的开始，创建一个对<code>self</code>的<code>strong</code>引用——这样在block执行期间，你不用担心<code>self</code>被销毁。然后等你不需要用到<code>self</code>的<code>strong</code>引用时候，可以将<code>strongSelf</code>置nil，或者干脆不管，等待代码执行结束退出（ARC，你懂的）。如果你按照这个方法做了，应该不会有什么问题了。所以，代码结构大致应该是这样的：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Foo</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Bar *bar;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>) Baz *baz;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)aMethod</span><br><span class="line">&#123;</span><br><span class="line">    __<span class="keyword">weak</span> Foo *blockSelf = <span class="keyword">self</span>;</span><br><span class="line">    bar.block = ^</span><br><span class="line">    &#123;</span><br><span class="line">        Foo *strongSelf = blockSelf</span><br><span class="line">        [strongSelf.baz doSomething];</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>另外，澄清一点，这段代码并不能保证线程安全，你仍然需要添加<code>@synchronize</code>域或者线程锁来保证线程安全。不过可以肯定的是，这样写一定比文章中提到的存在问题的代码要安全的多！</p>
+<h3 id="经验小结"><a href="#经验小结" class="headerlink" title="经验小结"></a>经验小结</h3><p>在用block的过程中，不要只对看得到<code>self</code>加<code>weak</code>引用，如果你像文章里那样直接访问成员变量，也是同样会存在<code>retain cycle</code>的问题。解决问题办法也很简单，使用文章里提到的解决方案，或者干脆把大段的代码移出block，这样反而更好些。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/02/hello-world/" rel="prev" title="Hello World">
+                Hello World <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">SealedAce</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#经验小结"><span class="nav-number">1.</span> <span class="nav-text">经验小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">SealedAce</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
