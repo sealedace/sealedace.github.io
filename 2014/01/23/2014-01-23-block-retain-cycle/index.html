@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="SealedAce&#39;s Blog">
 <meta property="og:description" content="我们知道在使用block时，必须避免出现retain cycle。如果写代码不仔细造成了retain cycle，就会出现内存泄露。即使Xcode有静态代码分析工具，但很多时候Xcode也不太靠谱，根本什么提示都没有，所以还是自己写代码多注意比较好。 （下文译自The Correct Way to Avoid Capturing Self in Blocks With ARC，有小改动）  201">
 <meta property="og:locale" content="Chinese/English">
-<meta property="og:updated_time" content="2019-03-02T08:48:54.846Z">
+<meta property="og:updated_time" content="2019-03-02T08:55:39.972Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于block坑爹的retain cycle">
 <meta name="twitter:description" content="我们知道在使用block时，必须避免出现retain cycle。如果写代码不仔细造成了retain cycle，就会出现内存泄露。即使Xcode有静态代码分析工具，但很多时候Xcode也不太靠谱，根本什么提示都没有，所以还是自己写代码多注意比较好。 （下文译自The Correct Way to Avoid Capturing Self in Blocks With ARC，有小改动）  201">
@@ -186,6 +186,26 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
           </a>
         </li>
       
@@ -297,6 +317,16 @@
 
           
             
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2014/01/23/2014-01-23-block-retain-cycle/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2014/01/23/2014-01-23-block-retain-cycle/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
           
 
           
@@ -389,6 +419,16 @@
           
 
   
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
 
 
 
@@ -446,10 +486,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/categories/index.html">
                   <span class="site-state-item-count">1</span>
                   <span class="site-state-item-name">categories</span>
-                
+                </a>
               </div>
             
 
@@ -459,6 +499,28 @@
 
           
 
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/sealedace" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:sealedaceg@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/sealedace" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
           
 
           
@@ -638,6 +700,26 @@
 
   
 
+    
+      <script id="dsq-count-scr" src="https://sealedace.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://sealedace.github.io/2014/01/23/2014-01-23-block-retain-cycle/';
+          this.page.identifier = '2014/01/23/2014-01-23-block-retain-cycle/';
+          this.page.title = '关于block坑爹的retain cycle';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://sealedace.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
 
 
 
@@ -650,10 +732,6 @@
   
 
 
-
-
-
-  
 
 
 
