@@ -97,14 +97,13 @@
 
 
   <meta name="description" content="git clone加速方法使用nc命令(netcat)实现，走Shadowsocks代理。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  环境 MacOS 配置好的Shadowsocks  1234Host github.comUser">
-<meta name="keywords" content="git">
 <meta property="og:type" content="article">
 <meta property="og:title" content="git clone加速方法">
 <meta property="og:url" content="https://sealedace.github.io/2019/03/11/git-clone-speed-up-method/index.html">
 <meta property="og:site_name" content="SealedAce&#39;s Blog">
 <meta property="og:description" content="git clone加速方法使用nc命令(netcat)实现，走Shadowsocks代理。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  环境 MacOS 配置好的Shadowsocks  1234Host github.comUser">
 <meta property="og:locale" content="Chinese/English">
-<meta property="og:updated_time" content="2019-03-11T03:55:08.429Z">
+<meta property="og:updated_time" content="2019-03-11T04:39:25.203Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git clone加速方法">
 <meta name="twitter:description" content="git clone加速方法使用nc命令(netcat)实现，走Shadowsocks代理。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  环境 MacOS 配置好的Shadowsocks  1234Host github.comUser">
@@ -375,7 +374,7 @@
                 
               
 
-              <time title="Created: 2019-03-11 11:34:28 / Modified: 11:55:08" itemprop="dateCreated datePublished" datetime="2019-03-11T11:34:28+08:00">2019-03-11</time>
+              <time title="Created: 2019-03-11 11:34:28 / Modified: 12:39:25" itemprop="dateCreated datePublished" datetime="2019-03-11T11:34:28+08:00">2019-03-11</time>
             
 
             
@@ -454,7 +453,7 @@
 <li>MacOS</li>
 <li>配置好的Shadowsocks</li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host github.com</span><br><span class="line">User git</span><br><span class="line">ProxyCommand /usr/bin/nc -X 5 -x 127.0.0.1:1086 %h %p</span><br><span class="line">IdentityFile ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host github.com</span><br><span class="line">User git</span><br><span class="line">ProxyCommand /usr/bin/nc -X 5 -x 127.0.0.1:1086 %h %p</span><br><span class="line">IdentityFile ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
 <p>使用man nc 查看 -X 字段支持的协议，5代表Socks5<br>把上面这段写进 ~/.ssh/config 文件（因为用到私钥认证所以带了 IdentityFile 选项）这里 127.0.0.1:1086 是一个 SOCKS5 代理，SSH 会通过 nc 命令打开的管道连接到 GitHub。</p>
 <p>nc 支持用 -X 指定 SOCKS4、SOCKS5、HTTPS 代理协议，参见 manpage。</p>
 
@@ -477,12 +476,6 @@
     
 
     <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/git/" rel="tag"># git</a>
-          
-        </div>
       
 
       
@@ -604,23 +597,6 @@
                 </div>
               
 
-              
-                
-                
-                <div class="site-state-item site-state-tags">
-                  
-                    
-                      <a href="/tags/">
-                    
-                  
-                    
-                    
-                      
-                    
-                    <span class="site-state-item-count">1</span>
-                    <span class="site-state-item-name">tags</span>
-                  </a>
-                </div>
               
             </nav>
           
