@@ -348,7 +348,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/2019/03/11/git-clone-speed-up-method/" class="post-title-link" itemprop="url">git clone在GitHub的加速方法</a>
+                <a href="/2019/03/11/git-clone-speed-up-method/" class="post-title-link" itemprop="url">git在GitHub的加速方法</a>
               
             
           </h1>
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-03-12 11:44:42" itemprop="dateModified" datetime="2019-03-12T11:44:42+08:00">2019-03-12</time>
+                <time title="Modified: 2019-03-12 18:21:44" itemprop="dateModified" datetime="2019-03-12T18:21:44+08:00">2019-03-12</time>
               
             
           </span>
@@ -444,25 +444,45 @@
       
         
           
-            <h2 id="前述"><a href="#前述" class="headerlink" title="前述"></a>前述</h2><p>本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。</p>
-<blockquote>
-<p>引用的别人的回答：<br><a href="https://www.zhihu.com/people/kamikat/activities" target="_blank" rel="noopener">https://www.zhihu.com/people/kamikat/activities</a></p>
-<p>知乎原文<br><a href="https://www.zhihu.com/question/27159393" target="_blank" rel="noopener">https://www.zhihu.com/question/27159393</a></p>
+            <blockquote>
+<p>在国内git加速太常用了，这里记录一下。<br><br>http 和 SSH 两种方法不一样，分别处理。</p>
 </blockquote>
-<p>如果坚持使用<code>http/https</code>方式，可以看上面链接里的方法，直接在git里全局配置</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --global http.proxy http://mydomain\\myusername:mypassword@myproxyserver:8080/</span><br></pre></td></tr></table></figure>
-<p>或者这样，如果一次性使用代理</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --config "http.proxy=proxyHost:proxyPort"</span><br></pre></td></tr></table></figure>
-<p>如果想用SSH，建议使用下面的方法。</p>
-<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h4 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h4><ul>
-<li>netcat程序(MacOS/Linux系统自带的)</li>
-<li>配置好的Shadowsocks</li>
-<li>git配置成SSH方式</li>
+<p>笔者的系统环境：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">操作系统: macOS Mojave 10.14.3</span><br><span class="line">Shadowsocks http代理: 0.0.0.0:1087</span><br><span class="line">Shadowsocks SOCKS5代理: 127.0.0.1:1086</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="git使用http协议"><a href="#git使用http协议" class="headerlink" title="git使用http协议"></a>git使用http协议</h2><ul>
+<li>如果想把git全局都走某个代理：</li>
 </ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --global http.proxy http://mydomain\\myusername:mypassword@myproxyserver:8080/</span><br></pre></td></tr></table></figure>
+<p>拿笔者的环境为例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --global http.proxy 127.0.0.1:1087</span><br></pre></td></tr></table></figure>
+<p>或者直接编辑<code>~/.gitconfig</code>文件，添加下面的内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[http]</span><br><span class="line">      proxy = 127.0.0.1:1087</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果只对某个git域名走代理，比如GitHub：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git config --global http.https://github.com.proxy http://127.0.0.1:1087</span><br></pre></td></tr></table></figure>
+<p>或者直接编辑<code>~/.gitconfig</code>文件，添加下面的内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[http &quot;https://github.com&quot;]</span><br><span class="line">       proxy = 127.0.0.1:1087</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果只是一次性使用代理：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git clone https://xxxx.git --config "http.proxy=proxyHost:proxyPort"</span><br></pre></td></tr></table></figure>
+<p>拿笔者的环境为例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git clone https://xxxx.git --config "http.proxy=127.0.0.1:1087"</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="git使用SSH协议"><a href="#git使用SSH协议" class="headerlink" title="git使用SSH协议"></a>git使用SSH协议</h2><p>使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。</p>
+<blockquote>
+<p>nc命令macOS/Linux系统自带，如果没有自行安装。</p>
+</blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host github.com</span><br><span class="line">User git</span><br><span class="line">ProxyCommand /usr/bin/nc -X 5 -x 127.0.0.1:1086 %h %p</span><br><span class="line">IdentityFile ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
-<p>将上面这段内容<strong>进行相应修改</strong>后写进 ~/.ssh/config 文件（因为用到私钥认证所以带了<code>IdentityFile</code>选项）。<br>我这里 <code>127.0.0.1:1086</code>对应是<code>Shadowsocks</code>里配置的<code>SOCKS5</code>代理，<code>-X 5</code>代表使用<code>SOCKS5</code>。具体参见manpage。</p>
+<p>将上面这段内容<strong>进行相应修改</strong>后写进 ~/.ssh/config 文件（因为用到私钥认证所以带了<code>IdentityFile</code>选项）。<br>我这里<code>127.0.0.1:1086</code>对应是<code>Shadowsocks</code>里配置的<code>SOCKS5</code>代理，<code>-X 5</code>代表使用<code>SOCKS5</code>。具体参见manpage。</p>
 <p>这样SSH就会通过<code>nc</code>命令打开的管道连接到GitHub。</p>
-<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><h4 id="效果："><a href="#效果：" class="headerlink" title="效果："></a>效果：</h4><p><img src="/images/77EC39D7-FCD8-44D8-ACD3-AC8FDACEB928.jpg" alt></p>
+<p><img src="/images/77EC39D7-FCD8-44D8-ACD3-AC8FDACEB928.jpg" alt></p>
+<hr>
+<blockquote>
+<p>参考：<a href="https://gist.github.com/evantoli/f8c23a37eb3558ab8765" target="_blank" rel="noopener">https://gist.github.com/evantoli/f8c23a37eb3558ab8765</a></p>
+</blockquote>
 
           
         
