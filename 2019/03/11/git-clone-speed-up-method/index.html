@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  如果坚持使用http/https方式，可">
+  <meta name="description" content="前述本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  如果坚持使用http/https方式">
 <meta property="og:type" content="article">
 <meta property="og:title" content="git clone在GitHub的加速方法">
 <meta property="og:url" content="https://sealedace.github.io/2019/03/11/git-clone-speed-up-method/index.html">
 <meta property="og:site_name" content="SealedAce&#39;s Blog">
-<meta property="og:description" content="本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  如果坚持使用http/https方式，可">
+<meta property="og:description" content="前述本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  如果坚持使用http/https方式">
 <meta property="og:locale" content="Chinese/English">
 <meta property="og:image" content="https://sealedace.github.io/images/77EC39D7-FCD8-44D8-ACD3-AC8FDACEB928.jpg">
-<meta property="og:updated_time" content="2019-03-12T03:38:56.923Z">
+<meta property="og:updated_time" content="2019-03-12T03:44:42.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git clone在GitHub的加速方法">
-<meta name="twitter:description" content="本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  如果坚持使用http/https方式，可">
+<meta name="twitter:description" content="前述本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。  引用的别人的回答：https://www.zhihu.com/people/kamikat/activities 知乎原文https://www.zhihu.com/question/27159393  如果坚持使用http/https方式">
 <meta name="twitter:image" content="https://sealedace.github.io/images/77EC39D7-FCD8-44D8-ACD3-AC8FDACEB928.jpg">
 
 
@@ -393,7 +393,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-03-12 11:38:56" itemprop="dateModified" datetime="2019-03-12T11:38:56+08:00">2019-03-12</time>
+                <time title="Modified: 2019-03-12 11:44:42" itemprop="dateModified" datetime="2019-03-12T11:44:42+08:00">2019-03-12</time>
               
             
           </span>
@@ -445,7 +445,7 @@
       
 
       
-        <p>本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。</p>
+        <h2 id="前述"><a href="#前述" class="headerlink" title="前述"></a>前述</h2><p>本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。</p>
 <blockquote>
 <p>引用的别人的回答：<br><a href="https://www.zhihu.com/people/kamikat/activities" target="_blank" rel="noopener">https://www.zhihu.com/people/kamikat/activities</a></p>
 <p>知乎原文<br><a href="https://www.zhihu.com/question/27159393" target="_blank" rel="noopener">https://www.zhihu.com/question/27159393</a></p>
@@ -455,7 +455,7 @@
 <p>或者这样，如果一次性使用代理</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --config "http.proxy=proxyHost:proxyPort"</span><br></pre></td></tr></table></figure>
 <p>如果想用SSH，建议使用下面的方法。</p>
-<h4 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h4><ul>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h4 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h4><ul>
 <li>netcat程序(MacOS/Linux系统自带的)</li>
 <li>配置好的Shadowsocks</li>
 <li>git配置成SSH方式</li>
@@ -463,8 +463,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host github.com</span><br><span class="line">User git</span><br><span class="line">ProxyCommand /usr/bin/nc -X 5 -x 127.0.0.1:1086 %h %p</span><br><span class="line">IdentityFile ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
 <p>将上面这段内容<strong>进行相应修改</strong>后写进 ~/.ssh/config 文件（因为用到私钥认证所以带了<code>IdentityFile</code>选项）。<br>我这里 <code>127.0.0.1:1086</code>对应是<code>Shadowsocks</code>里配置的<code>SOCKS5</code>代理，<code>-X 5</code>代表使用<code>SOCKS5</code>。具体参见manpage。</p>
 <p>这样SSH就会通过<code>nc</code>命令打开的管道连接到GitHub。</p>
-<p>效果：</p>
-<p><img src="/images/77EC39D7-FCD8-44D8-ACD3-AC8FDACEB928.jpg" alt></p>
+<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><h4 id="效果："><a href="#效果：" class="headerlink" title="效果："></a>效果：</h4><p><img src="/images/77EC39D7-FCD8-44D8-ACD3-AC8FDACEB928.jpg" alt></p>
 
       
     </div>
@@ -679,7 +678,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前提条件"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前述"><span class="nav-number">1.</span> <span class="nav-text">前述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开始"><span class="nav-number">2.</span> <span class="nav-text">开始</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#前提条件"><span class="nav-number">2.0.1.</span> <span class="nav-text">前提条件</span></a></li></ol></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#结束"><span class="nav-number">3.</span> <span class="nav-text">结束</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#效果："><span class="nav-number">3.0.1.</span> <span class="nav-text">效果：</span></a></li></ol></li></div>
             
 
           </div>
