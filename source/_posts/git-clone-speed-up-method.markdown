@@ -7,6 +7,7 @@ categories: DevTips
 ---
 
 
+## 前述
 本文的方法是在git配置为SSH方式的情况下，使用nc命令(netcat)实现，走Shadowsocks代理，从而加速从GitHub上clone代码。
 
 > 引用的别人的回答：
@@ -30,6 +31,7 @@ $ git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --c
 
 如果想用SSH，建议使用下面的方法。
 
+## 开始
 #### 前提条件
 
 * netcat程序(MacOS/Linux系统自带的)
@@ -48,7 +50,8 @@ $ git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --c
 
 这样SSH就会通过`nc`命令打开的管道连接到GitHub。
 
-效果：
+## 结束
+#### 效果：
 
 ![](/images/77EC39D7-FCD8-44D8-ACD3-AC8FDACEB928.jpg)
 
