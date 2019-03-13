@@ -8,8 +8,7 @@ categories: DevTips
 
 
 
-> 在国内git加速太常用了，这里记录一下。<br>
-> http 和 SSH 两种方法不一样，分别处理。
+> 在国内git加速太常用了，这里记录一下。<br>http 和 SSH 两种方法不一样，分别处理。
 
 
 笔者的系统环境：
@@ -96,6 +95,6 @@ $ git clone https://xxxx.git --config "http.proxy=127.0.0.1:1087"
 
 ---
 
-> 参考：https://gist.github.com/evantoli/f8c23a37eb3558ab8765
+> 参考：<br>https://gist.github.com/evantoli/f8c23a37eb3558ab8765<br>http://cms-sw.github.io/tutorial-proxy.html
 
 
